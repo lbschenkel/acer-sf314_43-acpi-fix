@@ -1,0 +1,38 @@
+--- dsdt.dsl.orig	2021-10-20 07:27:13.803259281 +0200
++++ dsdt.dsl	2021-10-20 07:46:34.682859017 +0200
+@@ -18,7 +18,7 @@
+  *     Compiler ID      "1025"
+  *     Compiler Version 0x00040000 (262144)
+  */
+-DefinitionBlock ("", "DSDT", 1, "ACRSYS", "ACRPRDCT", 0x00000002)
++DefinitionBlock ("", "DSDT", 1, "ACRSYS", "ACRPRDCT", 0x00000003)
+ {
+     External (_SB_.ALIB, MethodObj)    // 2 Arguments
+     External (_SB_.APTS, MethodObj)    // 1 Arguments
+@@ -809,20 +809,13 @@
+         Zero, 
+         Zero
+     })
+-    If ((CNSB == Zero))
++    Name (_S3, Package (0x04)  // _S3_: S3 System State
+     {
+-        If ((DAS3 == One))
+-        {
+-            Name (_S3, Package (0x04)  // _S3_: S3 System State
+-            {
+-                0x03, 
+-                0x03, 
+-                Zero, 
+-                Zero
+-            })
+-        }
+-    }
+-
++        0x03, 
++        0x03, 
++        Zero, 
++        Zero
++    })
+     Name (_S4, Package (0x04)  // _S4_: S4 System State
+     {
+         0x04, 
