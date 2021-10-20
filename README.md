@@ -97,3 +97,11 @@ menuentry "..." {
 ```
 Note that multiple `initrd` entries *do not work*, and any additional initrd files
 must be declared in `options`.
+
+## Known issues
+
+- If the value of `/sys/power/mem_sleep` is changed after boot then the laptop
+  does not successfully wake up from standby: fans, lights and the display backlight turn on but the display remains black.
+  - This happens even when `amdgpu.gpu_recovery=1`.
+  - Does not apply when `mem_sleep_default` is used, this method works fine.
+  - Tested on Linux 5.15, not tested on earlier kernels.
