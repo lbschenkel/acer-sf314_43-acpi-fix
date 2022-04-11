@@ -39,7 +39,7 @@ acpi/dsdt-patched.aml: acpi/dsdt-patched.dsl
 
 acpi/dsdt-patched.dsl: dsdt.patch acpi/dsdt.dsl
 	patch -N -o $@ acpi/dsdt.dsl dsdt.patch \
-	|| [ $$? == 1 ] && cp -v acpi/dsdt.dsl $@ \
+	|| ([ $$? == 1 ] && cp -v acpi/dsdt.dsl $@) \
 	|| exit $$?
 
 acpi/dsdt.dsl: acpi/*.dat
