@@ -33,23 +33,51 @@ This repository contains the [patch to the DSDT](dsdt.patch) and a Makefile to a
 
 - Laptop model: Acer Swift 3 SF314-43
 - BIOS version: [1.04](https://global-download.acer.com/GDFiles/BIOS/BIOS/BIOS_Acer_1.04_A_A.zip?acerid=637659969200273816) (2021-08-31, "Enable fTPM support for China")
-- `acpica` package
+- `acpica` package (personally tested only with versions 2021 or higher)
 
 ## Building initrd with patched ACPI DSDT
 
-To automatically patch the ACPI DSDT and generate an initrd image, just run `make`.
-Patching will fail if the BIOS is not an exact match (check requirements above).
+### Automatically
 
-Manual process:
+To automatically patch the ACPI DSDT and generate an initrd image, just run `make`.
+If everything goes well, it will end with a "SUCCESS!" message.
+
+### Manually
 1. Install the `acpica` package
 2. Run `acpidump -b` to dump all ACPI tables to `*.dat` files
-3. Run `iasl -e *.dat -d dsdt.dat` to decompile the DSDT table to `dsdt.dsl`
-4. Patch the DSDT via `patch < dsdt.patch`
+3. Run `iasl -we -w3 -e *.dat -d dsdt.dat` to decompile the DSDT to `dsdt.dsl`
+   - read next section if you want to try out without `-we`
+4. Patch the DSDT via `patch -F0 -N < dsdt.patch`
+   - read next section if you want to try out without `-F0`
 5. Recompile the DSDT via `iasl -ve dsdt.dsl`
 6. Generate initrd image:
    1. `mkdir -p kernel/firmware/acpi`
    2. `cp dsdt.aml kernel/firmware/acpi/`
    3. `find kernel | cpio -H newc --create > /boot/acpi-override.img`
+
+### In case of failure
+
+The process will fail if:
+1. Issues were encountered while decompiling the ACPI tables
+2. the BIOS is not an exact match (check requirements above)
+
+To minimize the chance of issues caused by mismatches, the Makefile and
+instructions are very strict regarding DSDT decompilation and patching:
+1. warnings during decompilation are treated as errors
+2. patching will not allow any "fuzz" (only exact matches)
+
+Depending on the installed version of `acpica`, it may not be able to decompile
+the DSDT without warnings and/or the output might be slightly different which
+would cause failures during patching.
+
+In this case it is possible to try (by changing the Makefile):
+1. decompiling with `iasl` without the `-we` argument
+2. patching with `patch` without the `-F0` argument
+
+When attempting this, then analyze *very carefully* any warnings produced by
+`iasl`. If it looks like the decompilation was only partially successful, then
+do not attempt to proceed even if patching works — the new DSDT may be incorrect
+and cause system instability.
 
 ## Configuring boot loader
 

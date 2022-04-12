@@ -38,12 +38,12 @@ acpi/dsdt-patched.aml: acpi/dsdt-patched.dsl
 	iasl -ve $?
 
 acpi/dsdt-patched.dsl: dsdt.patch acpi/dsdt.dsl
-	patch -N -o $@ acpi/dsdt.dsl dsdt.patch \
-	|| ([ $$? == 1 ] && cp -v acpi/dsdt.dsl $@) \
-	|| exit $$?
+	patch -F0 -t -N -o $@ acpi/dsdt.dsl dsdt.patch \
+	|| (rm -f $@; echo; echo 'ABORTED: not possible to patch the ACPI tables; wrong BIOS version or already patched?'; exit 1)
 
 acpi/dsdt.dsl: acpi/*.dat
-	iasl -e acpi/*.dat -d acpi/dsdt.dat
+	iasl -we -w3 -e acpi/*.dat -d acpi/dsdt.dat \
+	|| (echo; echo 'ABORTED: errors/warnings decompiling the ACPI tables; acpica package too old?'; exit 1)
 
 acpi/*.dat:
 	mkdir -p acpi
