@@ -133,3 +133,19 @@ must be declared in `options`.
   - This happens even when `amdgpu.gpu_recovery=1`.
   - Does not apply when `mem_sleep_default` is used, this method works fine.
   - Tested on Linux 5.15, not tested on earlier kernels.
+
+
+## FAQs
+
+**Q: Why not simply providing a `.img` file with the DSDT override?**
+
+**A:** Because:
+1. Then there's no risk of somebody mistakenly using the DSDT override in a
+   machine with a different BIOS version (or worse: a different machine
+   altogether) and getting unpredictable results.
+2. This repository avoids redistributing portions of Acer's BIOS, staying
+   clear of any potential legal issues.
+
+**Q: Why not including the `.dsl` file with the decompiled DSDT?**
+
+**A:** See previous answer.
