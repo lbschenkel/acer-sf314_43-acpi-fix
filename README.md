@@ -32,7 +32,8 @@ This repository contains the [patch to the DSDT](dsdt.patch) and a Makefile to a
 ## Requirements
 
 - Laptop model: Acer Swift 3 SF314-43
-- BIOS version: [1.04](https://global-download.acer.com/GDFiles/BIOS/BIOS/BIOS_Acer_1.04_A_A.zip?acerid=637659969200273816) (2021-08-31, "Enable fTPM support for China")
+- BIOS version: [1.06](https://global-download.acer.com/GDFiles/BIOS/BIOS/BIOS_Acer_1.06_A_A.zip?acerid=637998440494605648)&nbsp;(2022-09-27, "Support Win11 SV2")
+             or [1.04](https://global-download.acer.com/GDFiles/BIOS/BIOS/BIOS_Acer_1.04_A_A.zip?acerid=637659969200273816)&nbsp;(2021-08-31, "Enable fTPM support for China")
 - `acpica` package (personally tested only with versions 2021 or higher)
 
 ## Building initrd with patched ACPI DSDT
