@@ -8,7 +8,7 @@ and the firmware does not advertise S3 sleep state by default:
 kernel: ACPI: PM: (supports S0 S4 S5)
 ```
 ```
-# cat /sys/power/mem_sleep                                                            ✔  
+# cat /sys/power/mem_sleep
 [s2idle]
 ```
 This means that Linux never uses [suspend-to-RAM](https://www.kernel.org/doc/html/latest/admin-guide/pm/sleep-states.html#suspend-to-ram)
@@ -23,7 +23,7 @@ However, it's possible to patch the firmware's ACPI DSDT table to restore S3 sup
 kernel: ACPI: PM: (supports S0 S3 S4 S5)
 ```
 ```
-# cat /sys/power/mem_sleep                                                            ✔  
+# cat /sys/power/mem_sleep
 s2idle [deep]
 ```
 
