@@ -1,0 +1,823 @@
+diff -u acpi-old/bgrt.dsl acpi/bgrt.dsl
+--- acpi-old/bgrt.dsl	2023-06-14 15:31:23.030314633 +0200
++++ acpi/bgrt.dsl	2023-06-14 16:45:09.459612279 +0200
+@@ -9,7 +9,7 @@
+ [000h 0000 004h]                   Signature : "BGRT"    [Boot Graphics Resource Table]
+ [004h 0004 004h]                Table Length : 00000038
+ [008h 0008 001h]                    Revision : 01
+-[009h 0009 001h]                    Checksum : 3A
++[009h 0009 001h]                    Checksum : 2A
+ [00Ah 0010 006h]                      Oem ID : "ACRSYS"
+ [010h 0016 008h]                Oem Table ID : "ACRPRDCT"
+ [018h 0024 004h]                Oem Revision : 00000001
+@@ -21,7 +21,7 @@
+                                    Displayed : 0
+                           Orientation Offset : 0
+ [027h 0039 001h]                  Image Type : 00
+-[028h 0040 008h]               Image Address : 00000000B41E9000
++[028h 0040 008h]               Image Address : 00000000B41EA000
+ [030h 0048 004h]               Image OffsetX : 00000240
+ [034h 0052 004h]               Image OffsetY : 000000C4
+ 
+diff -u acpi-old/dsdt.dsl acpi/dsdt.dsl
+--- acpi-old/dsdt.dsl	2023-06-14 15:31:23.033647976 +0200
++++ acpi/dsdt.dsl	2023-06-14 16:45:09.462945626 +0200
+@@ -7,7 +7,7 @@
+  *     Signature        "DSDT"
+  *     Length           0x00007EBE (32446)
+  *     Revision         0x01 **** 32-bit table (V1), no 64-bit math support
+- *     Checksum         0xCA
++ *     Checksum         0x41
+  *     OEM ID           "ACRSYS"
+  *     OEM Table ID     "ACRPRDCT"
+  *     OEM Revision     0x00000002 (2)
+@@ -835,7 +835,7 @@
+     })
+     Scope (_GPE)
+     {
+-        Method (XL08, 0, NotSerialized)
++        Method (_L08, 0, NotSerialized)  // _Lxx: Level-Triggered GPE, xx=0x00-0xFF
+         {
+             TPST (0x3908)
+             If ((TBEN == Zero))
+@@ -850,7 +850,7 @@
+             Notify (\_SB.PWRB, 0x02) // Device Wake
+         }
+ 
+-        Method (XL19, 0, NotSerialized)
++        Method (_L19, 0, NotSerialized)  // _Lxx: Level-Triggered GPE, xx=0x00-0xFF
+         {
+             TPST (0x3919)
+             Notify (\_SB.PCI0.GP17.XHC0, 0x02) // Device Wake
+@@ -2022,7 +2022,7 @@
+             Device (GPP2)
+             {
+                 Name (_ADR, 0x00010003)  // _ADR: Address
+-                Method (RHRW, 0, NotSerialized)
++                Method (_PRW, 0, NotSerialized)  // _PRW: Power Resources for Wake
+                 {
+                     If ((WKPM == One))
+                     {
+@@ -2164,7 +2164,7 @@
+             Device (GPP3)
+             {
+                 Name (_ADR, 0x00020001)  // _ADR: Address
+-                Method (RHRW, 0, NotSerialized)
++                Method (_PRW, 0, NotSerialized)  // _PRW: Power Resources for Wake
+                 {
+                     If ((WKPM == One))
+                     {
+@@ -2306,7 +2306,7 @@
+             Device (GPP4)
+             {
+                 Name (_ADR, 0x00020002)  // _ADR: Address
+-                Method (RHRW, 0, NotSerialized)
++                Method (_PRW, 0, NotSerialized)  // _PRW: Power Resources for Wake
+                 {
+                     If ((WKPM == One))
+                     {
+@@ -2682,7 +2682,7 @@
+             Device (GPP5)
+             {
+                 Name (_ADR, 0x00020003)  // _ADR: Address
+-                Method (RHRW, 0, NotSerialized)
++                Method (_PRW, 0, NotSerialized)  // _PRW: Power Resources for Wake
+                 {
+                     If ((WKPM == One))
+                     {
+@@ -3400,7 +3400,7 @@
+                 Device (XHC0)
+                 {
+                     Name (_ADR, 0x03)  // _ADR: Address
+-                    Name (RHRW, Package (0x02)
++                    Name (_PRW, Package (0x02)  // _PRW: Power Resources for Wake
+                     {
+                         0x0D, 
+                         0x04
+@@ -3526,7 +3526,7 @@
+                 Device (XHC1)
+                 {
+                     Name (_ADR, 0x04)  // _ADR: Address
+-                    Method (RHRW, 0, NotSerialized)
++                    Method (_PRW, 0, NotSerialized)  // _PRW: Power Resources for Wake
+                     {
+                         Return (GPRW (0x19, 0x04))
+                     }
+@@ -3764,7 +3764,7 @@
+             Device (GP19)
+             {
+                 Name (_ADR, 0x00080003)  // _ADR: Address
+-                Method (RHRW, 0, NotSerialized)
++                Method (_PRW, 0, NotSerialized)  // _PRW: Power Resources for Wake
+                 {
+                     If ((WKPM == One))
+                     {
+@@ -4503,7 +4503,7 @@
+ 
+             Scope (GPP2)
+             {
+-                Method (_CRS, 0, NotSerialized)  // _CRS: Current Resource Settings
++                Method (RHRS, 0, NotSerialized)
+                 {
+                     Name (RBUF, ResourceTemplate ()
+                     {
+@@ -4520,7 +4520,7 @@
+                                 0x00AC
+                             }
+                     })
+-                    Return (RBUF) /* \_SB_.PCI0.GPP2._CRS.RBUF */
++                    Return (RBUF) /* \_SB_.PCI0.GPP2.RHRS.RBUF */
+                 }
+             }
+ 
+@@ -4531,7 +4531,7 @@
+ 
+             Scope (GPP3)
+             {
+-                Method (_CRS, 0, NotSerialized)  // _CRS: Current Resource Settings
++                Method (RHRS, 0, NotSerialized)
+                 {
+                     Name (RBUF, ResourceTemplate ()
+                     {
+@@ -4548,7 +4548,7 @@
+                                 0x00AC
+                             }
+                     })
+-                    Return (RBUF) /* \_SB_.PCI0.GPP3._CRS.RBUF */
++                    Return (RBUF) /* \_SB_.PCI0.GPP3.RHRS.RBUF */
+                 }
+             }
+ 
+@@ -4559,7 +4559,7 @@
+ 
+             Scope (GPP4)
+             {
+-                Method (_CRS, 0, NotSerialized)  // _CRS: Current Resource Settings
++                Method (RHRS, 0, NotSerialized)
+                 {
+                     Name (RBUF, ResourceTemplate ()
+                     {
+@@ -4576,7 +4576,7 @@
+                                 0x00AC
+                             }
+                     })
+-                    Return (RBUF) /* \_SB_.PCI0.GPP4._CRS.RBUF */
++                    Return (RBUF) /* \_SB_.PCI0.GPP4.RHRS.RBUF */
+                 }
+             }
+ 
+diff -u acpi-old/facp.dsl acpi/facp.dsl
+--- acpi-old/facp.dsl	2023-06-14 15:31:23.033647976 +0200
++++ acpi/facp.dsl	2023-06-14 16:45:09.462945626 +0200
+@@ -9,7 +9,7 @@
+ [000h 0000 004h]                   Signature : "FACP"    [Fixed ACPI Description Table (FADT)]
+ [004h 0004 004h]                Table Length : 0000010C
+ [008h 0008 001h]                    Revision : 05
+-[009h 0009 001h]                    Checksum : 87
++[009h 0009 001h]                    Checksum : B7
+ [00Ah 0010 006h]                      Oem ID : "ACRSYS"
+ [010h 0016 008h]                Oem Table ID : "ACRPRDCT"
+ [018h 0024 004h]                Oem Revision : 00000002
+@@ -59,12 +59,12 @@
+                 PCIe ASPM Not Supported (V4) : 0
+                    CMOS RTC Not Present (V5) : 0
+ [06Fh 0111 001h]                    Reserved : 00
+-[070h 0112 004h]       Flags (decoded below) : 0020C5BD
++[070h 0112 004h]       Flags (decoded below) : 0000C5AD
+       WBINVD instruction is operational (V1) : 1
+               WBINVD flushes all caches (V1) : 0
+                     All CPUs support C1 (V1) : 1
+                   C2 works on MP system (V1) : 1
+-            Control Method Power Button (V1) : 1
++            Control Method Power Button (V1) : 0
+             Control Method Sleep Button (V1) : 1
+         RTC wake not in fixed reg space (V1) : 0
+             RTC can wake system from S4 (V1) : 1
+@@ -81,7 +81,7 @@
+                  Use APIC Cluster Model (V4) : 0
+      Use APIC Physical Destination Mode (V4) : 0
+                        Hardware Reduced (V5) : 0
+-                      Low Power S0 Idle (V5) : 1
++                      Low Power S0 Idle (V5) : 0
+ 
+ [074h 0116 00Ch]              Reset Register : [Generic Address Structure]
+ [074h 0116 001h]                    Space ID : 01 [SystemIO]
+diff -u acpi-old/ssdt13.dsl acpi/ssdt13.dsl
+--- acpi-old/ssdt13.dsl	2023-06-14 15:31:23.033647976 +0200
++++ acpi/ssdt13.dsl	2023-06-14 16:45:09.462945626 +0200
+@@ -5,9 +5,9 @@
+  *
+  * Original Table Header:
+  *     Signature        "SSDT"
+- *     Length           0x00000042 (66)
++ *     Length           0x0000007D (125)
+  *     Revision         0x01
+- *     Checksum         0x24
++ *     Checksum         0x62
+  *     OEM ID           "ACRSYS"
+  *     OEM Table ID     "ACRPRDCT"
+  *     OEM Revision     0x00000001 (1)
+@@ -16,14 +16,45 @@
+  */
+ DefinitionBlock ("", "SSDT", 1, "ACRSYS", "ACRPRDCT", 0x00000001)
+ {
+-    External (_SB_.PCI0.GPP0, DeviceObj)
++    External (_SB_.PLTF, DeviceObj)
+ 
+-    Scope (\_SB.PCI0.GPP0)
++    Scope (\_SB.PLTF)
+     {
+-        Device (DEV0)
++        Name (_LPI, Package (0x04)  // _LPI: Low Power Idle States
+         {
+-            Name (_ADR, Zero)  // _ADR: Address
+-        }
++            Zero, 
++            Zero, 
++            One, 
++            Package (0x0A)
++            {
++                0x000F4240, 
++                0xC350, 
++                Zero, 
++                Zero, 
++                Zero, 
++                Zero, 
++                Zero, 
++                ResourceTemplate ()
++                {
++                    Register (SystemMemory, 
++                        0x00,               // Bit Width
++                        0x00,               // Bit Offset
++                        0x0000000000000000, // Address
++                        ,)
++                }, 
++
++                ResourceTemplate ()
++                {
++                    Register (SystemMemory, 
++                        0x00,               // Bit Width
++                        0x00,               // Bit Offset
++                        0x0000000000000000, // Address
++                        ,)
++                }, 
++
++                "S0i3"
++            }
++        })
+     }
+ }
+ 
+diff -u acpi-old/ssdt14.dsl acpi/ssdt14.dsl
+--- acpi-old/ssdt14.dsl	2023-06-14 15:31:23.033647976 +0200
++++ acpi/ssdt14.dsl	2023-06-14 16:45:09.462945626 +0200
+@@ -5,9 +5,9 @@
+  *
+  * Original Table Header:
+  *     Signature        "SSDT"
+- *     Length           0x0000020A (522)
++ *     Length           0x00000517 (1303)
+  *     Revision         0x01
+- *     Checksum         0xFC
++ *     Checksum         0x5D
+  *     OEM ID           "ACRSYS"
+  *     OEM Table ID     "ACRPRDCT"
+  *     OEM Revision     0x00000001 (1)
+@@ -16,149 +16,249 @@
+  */
+ DefinitionBlock ("", "SSDT", 1, "ACRSYS", "ACRPRDCT", 0x00000001)
+ {
+-    External (_SB_.PCI0.GP17.XHC0, DeviceObj)
+-    External (_SB_.PCI0.GP17.XHC1, DeviceObj)
+-    External (MSTP, MethodObj)    // 1 Arguments
+-
+-    Scope (\_SB.PCI0.GP17.XHC0)
++    External (_SB_.PCI0.GP17.ACP_, DeviceObj)
++    External (_SB_.PCI0.GP17.AZAL, DeviceObj)
++    External (M000, MethodObj)    // 1 Arguments
++    External (M017, MethodObj)    // 6 Arguments
++    External (M019, MethodObj)    // 4 Arguments
++    External (M249, MethodObj)    // 4 Arguments
++    External (M250, MethodObj)    // 5 Arguments
++
++    Name (M278, One)
++    Name (M279, One)
++    Name (M27A, One)
++    Name (APGE, Zero)
++    Name (ACGE, One)
++    Method (M276, 0, NotSerialized)
+     {
+-        Name (D0U0, One)
+-        Name (D3U0, Zero)
+-        PowerResource (P0U0, 0x00, 0x0000)
++        If ((M27A == Zero))
+         {
+-            Method (_STA, 0, NotSerialized)  // _STA: Status
+-            {
+-                MSTP (0x3C05)
+-                Return (D0U0) /* \_SB_.PCI0.GP17.XHC0.D0U0 */
+-            }
+-
+-            Method (_ON, 0, NotSerialized)  // _ON_: Power On
+-            {
+-                MSTP (0x3C06)
+-                D0U0 = One
+-            }
+-
+-            Method (_OFF, 0, NotSerialized)  // _OFF: Power Off
+-            {
+-                MSTP (0x3C08)
+-                D0U0 = Zero
+-            }
++            M278 = Zero
+         }
+ 
+-        PowerResource (P3U0, 0x00, 0x0000)
++        If (((M278 == One) || (M279 == One)))
+         {
+-            Method (_STA, 0, NotSerialized)  // _STA: Status
+-            {
+-                MSTP (0x3C0A)
+-                Return (D3U0) /* \_SB_.PCI0.GP17.XHC0.D3U0 */
+-            }
+-
+-            Method (_ON, 0, NotSerialized)  // _ON_: Power On
+-            {
+-                MSTP (0x3C0B)
+-                D3U0 = One
+-            }
+-
+-            Method (_OFF, 0, NotSerialized)  // _OFF: Power Off
+-            {
+-                MSTP (0x3C0D)
+-                D3U0 = Zero
++            Local0 = M017 (Zero, 0x08, One, 0x19, Zero, 0x08)
++            Local1 = M019 (Local0, Zero, 0x05, Zero)
++            If ((M27A == Zero))
++            {
++                Local1 = 0x15E21022
++            }
++
++            If (((Local0 != Zero) && (Local0 != 0xFF)))
++            {
++                If ((Local1 != Ones))
++                {
++                    M000 (0xB4)
++                    If ((ACGE != Zero))
++                    {
++                        M250 (Zero, Zero, Zero, 0x03B10564, Zero)
++                        M250 (Zero, Zero, Zero, 0x03B10998, 0xC8)
++                        M250 (Zero, Zero, Zero, 0x03B10528, 0x59)
++                        Local4 = M249 (Zero, Zero, Zero, 0x03B10564)
++                        While ((Local4 == Zero))
++                        {
++                            Local4 = M249 (Zero, Zero, Zero, 0x03B10564)
++                            If ((Local4 != Zero))
++                            {
++                                Break
++                            }
++                        }
++                    }
++
++                    If ((APGE != Zero))
++                    {
++                        M250 (Zero, Zero, Zero, 0x0900E784, 0x0103)
++                        Local4 = One
++                        Local5 = 0x64
++                        While (((Local4 != Zero) && Local5))
++                        {
++                            Local4 = M249 (Zero, Zero, Zero, 0x0900E784)
++                            Local4 |= 0x06
++                            Local4 &= 0xFFFFFF0F
++                            M250 (Zero, Zero, Zero, 0x0900E784, Local4)
++                            Local4 = M249 (Zero, Zero, Zero, 0x0900E78C)
++                            Local4 &= 0x03
++                            Local5--
++                            Stall (0x63)
++                        }
++
++                        M250 (Zero, Zero, Zero, 0x0900E784, Zero)
++                        M000 (0xB5)
++                    }
++                }
+             }
+         }
++    }
+ 
+-        Name (_PR0, Package (0x01)  // _PR0: Power Resources for D0
+-        {
+-            P0U0
+-        })
+-        Name (_PR3, Package (0x01)  // _PR3: Power Resources for D3hot
+-        {
+-            P3U0
+-        })
+-        Method (_S0W, 0, NotSerialized)  // _S0W: S0 Device Wake State
++    Method (M277, 0, NotSerialized)
++    {
++        If ((M27A == Zero))
+         {
+-            MSTP (0x3C04)
+-            Return (0x04)
++            M278 = Zero
+         }
+ 
+-        Method (_PS0, 0, NotSerialized)  // _PS0: Power State 0
++        If (((M278 == Zero) && (M279 == Zero)))
+         {
+-            MSTP (0x3C01)
+-        }
+-
+-        Method (_PS3, 0, NotSerialized)  // _PS3: Power State 3
+-        {
+-            MSTP (0x3C03)
++            Local0 = M017 (Zero, 0x08, One, 0x19, Zero, 0x08)
++            Local1 = M019 (Local0, Zero, 0x05, Zero)
++            If ((M27A == Zero))
++            {
++                Local1 = 0x15E21022
++            }
++
++            If (((Local0 != Zero) && (Local0 != 0xFF)))
++            {
++                If ((Local1 != Ones))
++                {
++                    M000 (0xB6)
++                    If ((ACGE != Zero))
++                    {
++                        M250 (Zero, Zero, Zero, 0x03B10564, Zero)
++                        M250 (Zero, Zero, Zero, 0x03B10998, Zero)
++                        M250 (Zero, Zero, Zero, 0x03B10528, 0x59)
++                        Local4 = M249 (Zero, Zero, Zero, 0x03B10564)
++                        While ((Local4 == Zero))
++                        {
++                            Local4 = M249 (Zero, Zero, Zero, 0x03B10564)
++                            If ((Local4 != Zero))
++                            {
++                                Break
++                            }
++                        }
++                    }
++
++                    If ((APGE != Zero))
++                    {
++                        M250 (Zero, Zero, Zero, 0x0900E784, 0x0101)
++                        Local4 = One
++                        Local5 = 0x64
++                        While (((Local4 != 0x02) && Local5))
++                        {
++                            Local4 = M249 (Zero, Zero, Zero, 0x0900E784)
++                            Local4 |= 0x06
++                            Local4 &= 0xFFFFFF0F
++                            M250 (Zero, Zero, Zero, 0x0900E784, Local4)
++                            Local4 = M249 (Zero, Zero, Zero, 0x0900E78C)
++                            Local4 &= 0x03
++                            Local5--
++                            Stall (0x63)
++                        }
++
++                        M250 (Zero, Zero, Zero, 0x0900E784, Zero)
++                        M000 (0xB7)
++                    }
++                }
++            }
+         }
+     }
+ 
+-    Scope (\_SB.PCI0.GP17.XHC1)
++    Scope (\_SB.PCI0.GP17.ACP)
+     {
+-        Name (D0U1, One)
+-        Name (D3U1, Zero)
+-        PowerResource (P0U1, 0x00, 0x0000)
++        Method (_PS0, 0, NotSerialized)  // _PS0: Power State 0
+         {
+-            Method (_STA, 0, NotSerialized)  // _STA: Status
+-            {
+-                MSTP (0x3D05)
+-                Return (D0U1) /* \_SB_.PCI0.GP17.XHC1.D0U1 */
+-            }
+-
+-            Method (_ON, 0, NotSerialized)  // _ON_: Power On
+-            {
+-                MSTP (0x3D06)
+-                D0U1 = One
+-            }
+-
+-            Method (_OFF, 0, NotSerialized)  // _OFF: Power Off
+-            {
+-                MSTP (0x3D08)
+-                D0U1 = Zero
+-            }
++            M278 = One
++            M276 ()
+         }
+ 
+-        PowerResource (P3U1, 0x00, 0x0000)
++        Method (_PS3, 0, NotSerialized)  // _PS3: Power State 3
+         {
+-            Method (_STA, 0, NotSerialized)  // _STA: Status
+-            {
+-                MSTP (0x3D0A)
+-                Return (D3U1) /* \_SB_.PCI0.GP17.XHC1.D3U1 */
+-            }
++            M278 = Zero
++            M277 ()
++        }
+ 
+-            Method (_ON, 0, NotSerialized)  // _ON_: Power On
+-            {
+-                MSTP (0x3D0B)
+-                D3U1 = One
++        Method (MSG0, 3, Serialized)
++        {
++            M000 (0x5511)
++            OperationRegion (VARM, SystemIO, 0x80, 0x04)
++            Field (VARM, DWordAcc, NoLock, Preserve)
++            {
++                VARR,   32
++            }
++
++            If ((Arg2 != 0x09))
++            {
++                M000 (0x5518)
++                M250 (Zero, Zero, Zero, 0x00058A74, Arg0)
++                M250 (Zero, Zero, Zero, 0x00058A54, Arg1)
++                M250 (Zero, Zero, Zero, 0x00058A14, Arg2)
++                Local0 = M249 (Zero, Zero, Zero, 0x00058A74)
++                While ((Local0 == Zero))
++                {
++                    Local0 = M249 (Zero, Zero, Zero, 0x00058A74)
++                    If ((Local0 != Zero))
++                    {
++                        Break
++                    }
++                }
++
++                M000 (0x5519)
++                Local1 = M249 (Zero, Zero, Zero, 0x00058A54)
++                Return (Local1)
++            }
++
++            Name (MBOX, Buffer (0x04){})
++            Local0 = M249 (Zero, Zero, Zero, 0x03810570)
++            VARR = Local0
++            MBOX = Local0
++            CreateWordField (MBOX, Zero, STAS)
++            CreateByteField (MBOX, 0x02, CMDI)
++            CreateField (MBOX, 0x18, 0x05, RESV)
++            CreateBitField (MBOX, 0x1D, RSET)
++            CreateBitField (MBOX, 0x1E, RCOV)
++            CreateBitField (MBOX, 0x1F, REDY)
++            VARR = MBOX /* \_SB_.PCI0.GP17.ACP_.MSG0.MBOX */
++            While (((REDY != One) || (CMDI != Zero)))
++            {
++                Local0 = M249 (Zero, Zero, Zero, 0x03810570)
++                MBOX = Local0
++                M000 (0x5516)
++                VARR = MBOX /* \_SB_.PCI0.GP17.ACP_.MSG0.MBOX */
++            }
++
++            Local0 = Zero
++            MBOX = Local0
++            REDY = Zero
++            CMDI = 0x33
++            M000 (0x5514)
++            Local0 = MBOX /* \_SB_.PCI0.GP17.ACP_.MSG0.MBOX */
++            VARR = Local0
++            M250 (Zero, Zero, Zero, 0x03810570, Local0)
++            Sleep (One)
++            M000 (0x5515)
++            Local0 = M249 (Zero, Zero, Zero, 0x03810570)
++            MBOX = Local0
++            VARR = MBOX /* \_SB_.PCI0.GP17.ACP_.MSG0.MBOX */
++            While ((CMDI != Zero))
++            {
++                Local0 = M249 (Zero, Zero, Zero, 0x03810570)
++                MBOX = Local0
++                M000 (0x5517)
++                VARR = MBOX /* \_SB_.PCI0.GP17.ACP_.MSG0.MBOX */
+             }
+ 
+-            Method (_OFF, 0, NotSerialized)  // _OFF: Power Off
++            If ((STAS != Zero))
+             {
+-                MSTP (0x3D0D)
+-                D3U1 = Zero
++                M000 (0x5513)
+             }
+-        }
+ 
+-        Name (_PR0, Package (0x01)  // _PR0: Power Resources for D0
+-        {
+-            P0U1
+-        })
+-        Name (_PR3, Package (0x01)  // _PR3: Power Resources for D3hot
+-        {
+-            P3U1
+-        })
+-        Method (_S0W, 0, NotSerialized)  // _S0W: S0 Device Wake State
+-        {
+-            MSTP (0x3D04)
+-            Return (0x04)
++            M000 (0x5512)
++            Return (Local0)
+         }
++    }
+ 
++    Scope (\_SB.PCI0.GP17.AZAL)
++    {
+         Method (_PS0, 0, NotSerialized)  // _PS0: Power State 0
+         {
+-            MSTP (0x3D01)
++            M279 = One
++            M276 ()
+         }
+ 
+         Method (_PS3, 0, NotSerialized)  // _PS3: Power State 3
+         {
+-            MSTP (0x3D03)
++            M279 = Zero
++            M277 ()
+         }
+     }
+ }
+Only in acpi-old: ssdt15.dsl
+Only in acpi-old: ssdt16.dsl
+Only in acpi-old: ssdt17.dsl
+Only in acpi-old: ssdt18.dsl
+diff -u acpi-old/ssdt7.dsl acpi/ssdt7.dsl
+--- acpi-old/ssdt7.dsl	2023-06-14 15:31:23.036981320 +0200
++++ acpi/ssdt7.dsl	2023-06-14 16:45:09.466278973 +0200
+@@ -7,7 +7,7 @@
+  *     Signature        "SSDT"
+  *     Length           0x00005354 (21332)
+  *     Revision         0x02
+- *     Checksum         0x92
++ *     Checksum         0xA2
+  *     OEM ID           "ACRSYS"
+  *     OEM Table ID     "ACRPRDCT"
+  *     OEM Revision     0x00000001 (1)
+@@ -341,7 +341,7 @@
+                 0x00000001, 
+                 0x00000000, 
+                 0x00000000, 
+-                0x00000001, 
++                0x00000000, 
+                 ResourceTemplate ()
+                 {
+                     Register (SystemIO, 
+@@ -865,7 +865,7 @@
+                 0x00000001, 
+                 0x00000000, 
+                 0x00000000, 
+-                0x00000001, 
++                0x00000000, 
+                 ResourceTemplate ()
+                 {
+                     Register (SystemIO, 
+@@ -1389,7 +1389,7 @@
+                 0x00000001, 
+                 0x00000000, 
+                 0x00000000, 
+-                0x00000001, 
++                0x00000000, 
+                 ResourceTemplate ()
+                 {
+                     Register (SystemIO, 
+@@ -1913,7 +1913,7 @@
+                 0x00000001, 
+                 0x00000000, 
+                 0x00000000, 
+-                0x00000001, 
++                0x00000000, 
+                 ResourceTemplate ()
+                 {
+                     Register (SystemIO, 
+@@ -2437,7 +2437,7 @@
+                 0x00000001, 
+                 0x00000000, 
+                 0x00000000, 
+-                0x00000001, 
++                0x00000000, 
+                 ResourceTemplate ()
+                 {
+                     Register (SystemIO, 
+@@ -2961,7 +2961,7 @@
+                 0x00000001, 
+                 0x00000000, 
+                 0x00000000, 
+-                0x00000001, 
++                0x00000000, 
+                 ResourceTemplate ()
+                 {
+                     Register (SystemIO, 
+@@ -3485,7 +3485,7 @@
+                 0x00000001, 
+                 0x00000000, 
+                 0x00000000, 
+-                0x00000001, 
++                0x00000000, 
+                 ResourceTemplate ()
+                 {
+                     Register (SystemIO, 
+@@ -4009,7 +4009,7 @@
+                 0x00000001, 
+                 0x00000000, 
+                 0x00000000, 
+-                0x00000001, 
++                0x00000000, 
+                 ResourceTemplate ()
+                 {
+                     Register (SystemIO, 
+@@ -4533,7 +4533,7 @@
+                 0x00000001, 
+                 0x00000000, 
+                 0x00000000, 
+-                0x00000001, 
++                0x00000000, 
+                 ResourceTemplate ()
+                 {
+                     Register (SystemIO, 
+@@ -5057,7 +5057,7 @@
+                 0x00000001, 
+                 0x00000000, 
+                 0x00000000, 
+-                0x00000001, 
++                0x00000000, 
+                 ResourceTemplate ()
+                 {
+                     Register (SystemIO, 
+@@ -5581,7 +5581,7 @@
+                 0x00000001, 
+                 0x00000000, 
+                 0x00000000, 
+-                0x00000001, 
++                0x00000000, 
+                 ResourceTemplate ()
+                 {
+                     Register (SystemIO, 
+@@ -6105,7 +6105,7 @@
+                 0x00000001, 
+                 0x00000000, 
+                 0x00000000, 
+-                0x00000001, 
++                0x00000000, 
+                 ResourceTemplate ()
+                 {
+                     Register (SystemIO, 
+@@ -6629,7 +6629,7 @@
+                 0x00000001, 
+                 0x00000000, 
+                 0x00000000, 
+-                0x00000001, 
++                0x00000000, 
+                 ResourceTemplate ()
+                 {
+                     Register (SystemIO, 
+@@ -7153,7 +7153,7 @@
+                 0x00000001, 
+                 0x00000000, 
+                 0x00000000, 
+-                0x00000001, 
++                0x00000000, 
+                 ResourceTemplate ()
+                 {
+                     Register (SystemIO, 
+@@ -7677,7 +7677,7 @@
+                 0x00000001, 
+                 0x00000000, 
+                 0x00000000, 
+-                0x00000001, 
++                0x00000000, 
+                 ResourceTemplate ()
+                 {
+                     Register (SystemIO, 
+@@ -8201,7 +8201,7 @@
+                 0x00000001, 
+                 0x00000000, 
+                 0x00000000, 
+-                0x00000001, 
++                0x00000000, 
+                 ResourceTemplate ()
+                 {
+                     Register (SystemIO, 
+diff -u acpi-old/tpm2.dsl acpi/tpm2.dsl
+--- acpi-old/tpm2.dsl	2023-06-14 15:31:23.036981320 +0200
++++ acpi/tpm2.dsl	2023-06-14 16:45:09.466278973 +0200
+@@ -9,7 +9,7 @@
+ [000h 0000 004h]                   Signature : "TPM2"    [Trusted Platform Module hardware interface Table]
+ [004h 0004 004h]                Table Length : 0000004C
+ [008h 0008 001h]                    Revision : 04
+-[009h 0009 001h]                    Checksum : 69
++[009h 0009 001h]                    Checksum : 59
+ [00Ah 0010 006h]                      Oem ID : "ACRSYS"
+ [010h 0016 008h]                Oem Table ID : "ACRPRDCT"
+ [018h 0024 004h]                Oem Revision : 00000002
+@@ -23,5 +23,5 @@
+ 
+ [034h 0052 00Ch]           Method Parameters : 00 00 00 00 00 00 00 00 00 00 00 00
+ [040h 0064 004h]          Minimum Log Length : 00010000
+-[044h 0068 008h]                 Log Address : 00000000B5830000
++[044h 0068 008h]                 Log Address : 00000000B5831000
+ 
