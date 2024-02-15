@@ -23,6 +23,9 @@ This should theoretically work in any AMD computer, however I have **only** test
 - Laptop model: Acer Swift 3 SF314-43
 - Firmware version: [1.06](https://global-download.acer.com/GDFiles/BIOS/BIOS/BIOS_Acer_1.06_A_A.zip?acerid=637998440494605648)&nbsp;(2022-09-27, "Support Win11 SV2")
 
+
+- Laptop model: Acer Swift SF314-42
+- Firmware version: 1.08
 ## Be aware!
 
 - If your system does not match **exactly** the requirements described above, I don't know what will happen and you **may brick your computer**.
