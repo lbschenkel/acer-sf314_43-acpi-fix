@@ -73,7 +73,13 @@ Now your laptop can enjoy a good night of S3 sleep!
 
 ## Known issues
 
-None so far.
+- Cannot access UEFI settings in SF314-42
+  - Boot into the USB again
+  - Go to ``BootManager``
+  - Select Delete option
+  - Select all the ``UEFI-Misc-*`` options
+  - Delete all those, make sure you are not touching other enteries
+  - Save the changes and select Continue
 
 ## FAQs
 
