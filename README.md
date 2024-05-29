@@ -21,7 +21,9 @@ There is a way to fix this: booting into an [UEFI program](#is-this-your-program
 This should theoretically work in any AMD computer, however I have **only** tested it with the following combination:
 
 - Laptop model: Acer Swift 3 SF314-43
-- Firmware version: [1.06](https://global-download.acer.com/GDFiles/BIOS/BIOS/BIOS_Acer_1.06_A_A.zip?acerid=637998440494605648)&nbsp;(2022-09-27, "Support Win11 SV2")
+- Firmware versions:
+  - [1.08](https://global-download.acer.com/GDFiles/BIOS/BIOS/BIOS_Acer_1.08_A_A.zip?acerid=638301863132363694)&nbsp;(2023-09-13, "Add Acer battery battery information...")
+  - [1.06](https://global-download.acer.com/GDFiles/BIOS/BIOS/BIOS_Acer_1.06_A_A.zip?acerid=637998440494605648)&nbsp;(2022-09-27, "Support Win11 SV2")
 
 ## Be aware!
 
