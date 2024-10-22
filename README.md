@@ -22,8 +22,15 @@ This should theoretically work in any AMD computer, however I have **only** test
 
 - Laptop model: Acer Swift 3 SF314-43
 - Firmware versions:
+  - [1.10](https://global-download.acer.com/GDFiles/BIOS/BIOS/BIOS_Acer_1.10_A_A.zip?acerid=638598299263842761)&nbsp;(2024-08-21, "Update CezannePI...")
   - [1.08](https://global-download.acer.com/GDFiles/BIOS/BIOS/BIOS_Acer_1.08_A_A.zip?acerid=638301863132363694)&nbsp;(2023-09-13, "Add Acer battery battery information...")
   - [1.06](https://global-download.acer.com/GDFiles/BIOS/BIOS/BIOS_Acer_1.06_A_A.zip?acerid=637998440494605648)&nbsp;(2022-09-27, "Support Win11 SV2")
+  
+In addition, other users reported success with those combinations (untested by me!):
+
+- Laptop model: Acer Swift 3 SF314-42
+  - Firmware versions: 1.08 [[#4]](https://github.com/lbschenkel/acer-sf314_43-acpi-fix/pull/4)
+
 
 ## Be aware!
 
@@ -72,7 +79,15 @@ Now your laptop can enjoy a good night of S3 sleep!
 
 ## Known issues
 
-None so far.
+Not experienced by me, but reported by users:
+
+- Cannot access UEFI settings: [[#4]](https://github.com/lbschenkel/acer-sf314_43-acpi-fix/pull/4)
+  - Boot into the USB again
+  - Go to ``BootManager``
+  - Select Delete option
+  - Select all the ``UEFI-Misc-*`` options
+  - Delete all those, make sure you are not touching other entries
+  - Save the changes and select Continue
 
 ## FAQs
 
